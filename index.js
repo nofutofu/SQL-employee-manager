@@ -112,17 +112,10 @@ const addDepartment = async () => {
     name: 'department',
     message: 'Enter department name you wish to add.',
   });
-  await db.promise().query(
-    `INSERT INTO department (name) VALUES (?)`,
-    newDep.department,
-    (err, result) => {
-      if (err) {
-        console.log(err);
-        init();
-      }
-    },
-    viewDepartments(),
-  );
+  await db
+    .promise()
+    .query(`INSERT INTO department (name) VALUES (?)`, [newDep.department]);
+  viewDepartments();
 };
 
 const addRole = async () => {
@@ -199,7 +192,37 @@ const addEmployee = async () => {
   viewEmployees();
 };
 
-function updateEmployee() {}
+const updateEmployee = async () => {
+  const choiceRole = await db
+    .promise()
+    .query(`SELECT id AS value, title AS name FROM role`);
+  const choiceEmp = await db
+    .promise()
+    .query(
+      `SELECT id AS value, concat(first_name, " ", last_name) AS name FROM employee`,
+    );
+  const updateEmp = await inquirer.prompt([
+    {
+      type: 'list',
+      name: 'employee',
+      message: 'Choose which employee you wish to update',
+      choices: choiceEmp[0],
+    },
+    {
+      type: 'list',
+      name: 'role',
+      message: 'Choose which role you wish to give to this employee',
+      choices: choiceRole[0],
+    },
+  ]);
+  await db
+    .promise()
+    .query(`UPDATE employee SET role_id = ? WHERE id = ?`, [
+      updateEmp.role,
+      updateEmp.employee,
+    ]);
+  viewEmployees();
+};
 
 function endProcess() {
   console.log('Goodbye.');

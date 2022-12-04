@@ -86,13 +86,15 @@ function viewRoles() {
 function viewEmployees() {
   db.query(
     `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS 
-    'department', role.salary, concat(employee.first_name, " ", employee.last_name) AS manager 
-    FROM employee
-    RIGHT JOIN role 
-    ON employee.role_id = role.id
-    RIGHT JOIN department 
-    ON role.department_id = department.id;`,
-    // need to add manager functionality
+    department, role.salary, concat(manager.first_name, ' ', manager.last_name) AS manager
+        FROM employee
+        RIGHT JOIN role 
+        ON employee.role_id = role.id
+        RIGHT JOIN department 
+        ON role.department_id = department.id
+        LEFT JOIN employee manager 
+        ON manager.id = employee.manager_id;`,
+
     function (err, results) {
       if (err) {
         console.log(err);
@@ -155,7 +157,40 @@ const addRole = async () => {
   viewRoles();
 };
 
-function addEmployee() {}
+const addEmployee = async () => {
+  const choiceRole = await db
+    .promise()
+    .query(`SELECT id AS value, name AS name FROM role`);
+  const choiceManager = await db
+    .promise()
+    .query(
+      `SELECT id AS value, concat(first_name, " ", last_name) AS name FROM employee`,
+    );
+  const newEmp = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'first',
+      message: 'Enter the first name of the employee.',
+    },
+    {
+      type: 'input',
+      name: 'last',
+      message: 'Enter the last name of the employee.',
+    },
+    {
+      type: 'list',
+      name: 'role',
+      message: 'Choose the role of the employee.',
+      choices: choiceRole[0],
+    },
+    // {
+    //     type: 'list',
+    //     name: 'manager',
+    //     message: 'Choose the manager of the employee if applicable',
+    //     choices:
+    // }
+  ]);
+};
 
 function updateEmployee() {}
 

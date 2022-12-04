@@ -1,10 +1,21 @@
 const inquirer = require('inquirer');
-const cTable = require('console.table');
+require('console.table');
+const mysql = require('mysql2');
+
+const db = mysql.createConnection(
+  {
+    host: 'localhost',
+    user: 'root',
+    password: '',
+    database: 'employee_db',
+  },
+  console.log(`Connected to employee_db database.`),
+);
 
 const choices = [
   {
     type: 'list',
-    name: 'choices',
+    name: 'choice',
     message: 'What would you like to do?',
     choices: [
       'View All Departments',
@@ -21,7 +32,7 @@ const choices = [
 
 function init() {
   inquirer.prompt(choices).then(response => {
-    switch (response) {
+    switch (response.choice) {
       case 'View All Departments':
         viewDepartments();
         break;
@@ -43,13 +54,67 @@ function init() {
       case "Update an Employee's Role":
         updateEmployee();
         break;
-      default:
+      case 'End Employee Management':
         endProcess();
         break;
     }
   });
 }
 
-function viewDepartments() {}
+function viewDepartments() {
+  db.query(`SELECT * FROM department`, function (err, results) {
+    if (err) {
+      console.log(err);
+      init();
+    }
+    console.table(results);
+    init();
+  });
+}
+
+function viewRoles() {
+  db.query(`SELECT * FROM role`, function (err, results) {
+    if (err) {
+      console.log(err);
+      init();
+    }
+    console.table(results);
+    init();
+  });
+}
+
+function viewEmployees() {
+  db.query(
+    `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS 
+    'department', role.salary, concat(employee.first_name, " ", employee.last_name) AS manager 
+    FROM employee
+    RIGHT JOIN role 
+    ON employee.role_id = role.id
+    RIGHT JOIN department 
+    ON role.department_id = department.id;`,
+    // need to add manager functionality
+    function (err, results) {
+      if (err) {
+        console.log(err);
+        init();
+      }
+      console.table(results);
+      init();
+    },
+  );
+}
+
+function addDepartment() {}
+
+function addRole() {}
+
+function addEmployee() {}
+
+function updateEmployee() {}
+
+function endProcess() {
+  console.log('Goodbye.');
+  process.exit();
+}
 
 init();

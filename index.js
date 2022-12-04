@@ -104,9 +104,56 @@ function viewEmployees() {
   );
 }
 
-function addDepartment() {}
+const addDepartment = async () => {
+  const newDep = await inquirer.prompt({
+    type: 'input',
+    name: 'department',
+    message: 'Enter department name you wish to add.',
+  });
+  await db.promise().query(
+    `INSERT INTO department (name) VALUES (?)`,
+    newDep.department,
+    (err, result) => {
+      if (err) {
+        console.log(err);
+        init();
+      }
+    },
+    viewDepartments(),
+  );
+};
 
-function addRole() {}
+const addRole = async () => {
+  const choiceDep = await db
+    .promise()
+    .query(`SELECT id AS value, name AS name FROM department`);
+  const newRole = await inquirer.prompt([
+    {
+      type: 'input',
+      name: 'title',
+      message: 'Enter role name you wish to add.',
+    },
+    {
+      type: 'input',
+      name: 'salary',
+      message: 'Enter the salary of the role.',
+    },
+    {
+      type: 'list',
+      name: 'department',
+      message: 'Which department is this role in?',
+      choices: choiceDep[0],
+    },
+  ]);
+  await db
+    .promise()
+    .query(`INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)`, [
+      newRole.title,
+      newRole.salary,
+      newRole.department,
+    ]);
+  viewRoles();
+};
 
 function addEmployee() {}
 

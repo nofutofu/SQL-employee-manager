@@ -2,6 +2,7 @@ const inquirer = require('inquirer');
 require('console.table');
 const mysql = require('mysql2');
 
+// sets up a connection to the mysql database
 const db = mysql.createConnection(
   {
     host: 'localhost',
@@ -12,6 +13,7 @@ const db = mysql.createConnection(
   console.log(`Connected to employee_db database.`),
 );
 
+// menu commands for the user to pick from
 const choices = [
   {
     type: 'list',
@@ -30,6 +32,7 @@ const choices = [
   },
 ];
 
+// starts off the terminal menu by providing the commands and routing to each responding function depending on the choice
 function init() {
   inquirer.prompt(choices).then(response => {
     switch (response.choice) {
@@ -61,6 +64,7 @@ function init() {
   });
 }
 
+// views all departments in the database
 function viewDepartments() {
   db.query(`SELECT * FROM department`, function (err, results) {
     if (err) {
@@ -72,6 +76,7 @@ function viewDepartments() {
   });
 }
 
+// views all roles along with salary in the database
 function viewRoles() {
   db.query(`SELECT * FROM role`, function (err, results) {
     if (err) {
@@ -83,6 +88,7 @@ function viewRoles() {
   });
 }
 
+// views all employees in the database displaying their id, names, roles, departments, salaries, and managers if they have one
 function viewEmployees() {
   db.query(
     `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS 
@@ -106,6 +112,7 @@ function viewEmployees() {
   );
 }
 
+// adds a new department to the database
 const addDepartment = async () => {
   const newDep = await inquirer.prompt({
     type: 'input',
@@ -118,6 +125,7 @@ const addDepartment = async () => {
   viewDepartments();
 };
 
+// adds a new role & salary to the database
 const addRole = async () => {
   const choiceDep = await db
     .promise()
@@ -150,6 +158,7 @@ const addRole = async () => {
   viewRoles();
 };
 
+// adds a new employee to the database along with their name, role and manager
 const addEmployee = async () => {
   const choiceRole = await db
     .promise()
@@ -192,6 +201,7 @@ const addEmployee = async () => {
   viewEmployees();
 };
 
+// updates an employee allowing for the changing of their role
 const updateEmployee = async () => {
   const choiceRole = await db
     .promise()
@@ -224,6 +234,7 @@ const updateEmployee = async () => {
   viewEmployees();
 };
 
+// kills the terminal process and stops the program
 function endProcess() {
   console.log('Goodbye.');
   process.exit();

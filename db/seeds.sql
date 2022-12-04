@@ -1,11 +1,13 @@
 USE employee_db;
 
+-- seeded data for example for department table
 INSERT INTO department (id, name)
 VALUES (1, 'Human Resources'),
        (2, 'Sales'),
        (3, 'Warehouse'),
        (4, 'Finance');
 
+-- seeded data for example for role table
 INSERT INTO role (id, title, salary, department_id)
 VALUES (51, 'Forklift Driver', 80000, 3),
        (52, 'Accountant', 120000, 4),
@@ -16,6 +18,7 @@ VALUES (51, 'Forklift Driver', 80000, 3),
        (57, 'HR Specialist', 95000, 1),
        (58, 'Sales Representetive', 90000, 2);
 
+-- seeded data for example for employee table
 INSERT INTO employee (id, first_name, last_name, role_id, manager_id)
 VALUES (101, 'Killian', 'Simmons', 53, 105),
        (102, 'Juliana', 'Patterson', 52, 105),

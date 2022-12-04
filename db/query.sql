@@ -4,8 +4,6 @@ SELECT * FROM department;
 
 SELECT * FROM role;
 
-SELECT * FROM employee;
-
 SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS 
 'department', role.salary, concat(employee.first_name, " ", employee.last_name) AS manager 
 FROM employee

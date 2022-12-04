@@ -88,7 +88,7 @@ function viewEmployees() {
     `SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS 
     department, role.salary, concat(manager.first_name, ' ', manager.last_name) AS manager
         FROM employee
-        RIGHT JOIN role 
+        LEFT JOIN role 
         ON employee.role_id = role.id
         RIGHT JOIN department 
         ON role.department_id = department.id
@@ -160,7 +160,7 @@ const addRole = async () => {
 const addEmployee = async () => {
   const choiceRole = await db
     .promise()
-    .query(`SELECT id AS value, name AS name FROM role`);
+    .query(`SELECT id AS value, title AS name FROM role`);
   const choiceManager = await db
     .promise()
     .query(
@@ -183,13 +183,20 @@ const addEmployee = async () => {
       message: 'Choose the role of the employee.',
       choices: choiceRole[0],
     },
-    // {
-    //     type: 'list',
-    //     name: 'manager',
-    //     message: 'Choose the manager of the employee if applicable',
-    //     choices:
-    // }
+    {
+      type: 'list',
+      name: 'manager',
+      message: 'Choose the manager of the employee if applicable',
+      choices: choiceManager[0],
+    },
   ]);
+  await db
+    .promise()
+    .query(
+      `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`,
+      [newEmp.first, newEmp.last, newEmp.role, newEmp.manager],
+    );
+  viewEmployees();
 };
 
 function updateEmployee() {}
